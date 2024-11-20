@@ -25,7 +25,7 @@ export async function GET(request: Request){
   const currency = userSettings.currency;
   
 
-  let isIndividualMode = mode === 'Individual';
+  const isIndividualMode = mode === 'Individual';
   let familyId = null;
   if(!isIndividualMode){
     const familyMember = await prisma.familyMember.findFirst({

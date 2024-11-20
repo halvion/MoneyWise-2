@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { createTransactionSchema, createTransactionSchemaType } from "@/schema/transaction";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { DateToUTCDate } from "@/lib/helpers";
 
 export async function createTransaction(form: createTransactionSchemaType) {
   const parsedBody = createTransactionSchema.safeParse(form);

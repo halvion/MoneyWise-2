@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { toast } from 'sonner';
 import TransactionsTable from './_components/TransactionsTable';
 
-function page() {
+function Page() {
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
@@ -46,4 +46,4 @@ function page() {
   )
 }
 
-export default page
+export default Page

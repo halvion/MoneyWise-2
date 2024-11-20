@@ -64,8 +64,7 @@ export function CurrencyComboBox() {
       setSelectedOption(
         Currencies.find(c => c.value === data.currency) || null
       );
-      onError: (e: any) =>{
-        console.error(e);
+      onError: () =>{
         toast.error("Something went wrong", {
           id: "update-currency",
         })

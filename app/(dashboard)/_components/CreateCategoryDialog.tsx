@@ -188,6 +188,6 @@ function CreateCategoryDialog({ type, successCallback, trigger }: Props) {
 
 export default CreateCategoryDialog;
 
-function zodResovler(CreateCategorySchema: any): import("react-hook-form").Resolver<CreateCategorySchemaType, any> | undefined {
+function zodResovler(): import("react-hook-form").Resolver<CreateCategorySchemaType> | undefined {
   throw new Error("Function not implemented.");
 }

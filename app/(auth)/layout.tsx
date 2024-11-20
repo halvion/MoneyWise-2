@@ -1,5 +1,4 @@
 import Logo from '@/components/Logo'
-import Logo2 from '@/components/Logo2'
 import React, { ReactNode } from 'react'
 
 function layout({ children }: { children: ReactNode }) {
