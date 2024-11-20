@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // You can switch to other providers like PostgreSQL as needed
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model UserSettings {
+  userId   String @id
+  currency String
+  mode     String @default("Individual") // "Individual" or "Family"
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  name      String
+  createdBy String // userId of the creator
+  createdAt DateTime @default(now())
+
+  members FamilyMember[] // Relation to FamilyMember model
+}
+
+model FamilyMember {
+  userId   String
+  familyId String
+  role     String // Roles like "Owner", "Admin", "Member"
+  joinedAt DateTime @default(now())
+
+  family Family @relation(fields: [familyId], references: [id])
+
+  @@id([userId, familyId]) // Composite primary key
+}
+
+model Category {
+  createdAt DateTime @default(now())
+  name      String
+  userId    String
+  familyId  String?
+  icon      String
+  type      String   @default("income")
+
+  @@unique([name, userId, type]) // Ensure unique per user/family and type
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  amount       Float
+  description  String
+  date         DateTime
+  userId       String // Nullable when part of a family transaction
+  familyId     String? // Nullable when used for individual transactions
+  type         String   @default("income")
+  isIndividual Boolean  @default(true) // Indicates if it is an individual transaction
+
+  category     String
+  categoryIcon String
+
+  @@index([userId, familyId]) // Add an index to optimize querying based on user/family context
+}
+
+model MonthHistory {
+  userId   String
+  familyId String?
+  day      Int
+  month    Int
+  year     Int
+  income   Float
+  expense  Float
+
+  @@id([userId, day, month, year]) // Composite primary key
+}
+
+model YearHistory {
+  userId   String
+  familyId String?
+  month    Int
+  year     Int
+  income   Float
+  expense  Float
+
+  @@id([userId, month, year]) // Composite primary key
+}
