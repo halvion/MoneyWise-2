@@ -76,7 +76,8 @@ async function getCategoriesStats(
       AND: [
         { date: { gte: from } },
         { date: { lte: to } },
-        mode === "Individual" ? { userId: userId } : { familyId: familyId },
+        { userId: userId },
+        { familyId: familyId },
         // temp fix because i havent set the function to delete the transaction if the category is deleted.
         {
           category: {
