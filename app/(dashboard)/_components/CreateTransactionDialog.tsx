@@ -63,7 +63,11 @@ function CreateTransactionDialog({ trigger, type }: Props) {
 
       // After creating a transaction, ,we need to invalidate the overview query which will refetch the transactions
       queryClient.invalidateQueries({
-        queryKey: ['overview'],
+        queryKey: ['overview', 'stats', 'categories'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['stats', 'balance'],
       });
 
       setOpen((prev) => !prev);
@@ -103,7 +107,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                   <FormControl>
                     <Input defaultValue={''}{...field} />
                   </FormControl>
-                  <FormDescription> 
+                  <FormDescription>
                     Transaction description (optional)
                   </FormDescription>
                 </FormItem>
@@ -173,7 +177,7 @@ function CreateTransactionDialog({ trigger, type }: Props) {
                         <Calendar mode="single"
                           selected={field.value}
                           onSelect={(value) => {
-                            if(!value) return;
+                            if (!value) return;
                             field.onChange(value);
                           }}
                           initialFocus

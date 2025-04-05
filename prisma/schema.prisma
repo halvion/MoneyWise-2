@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // You can switch to other providers like PostgreSQL as needed
-  url      = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "sqlite"
+  url      = "file:./dev.db" // Local SQLite database path
 }
 
 model UserSettings {
@@ -15,7 +14,7 @@ model UserSettings {
 }
 
 model Family {
-  id        String   @id @default(uuid())
+  familyId        String   @id @default(uuid())
   name      String
   createdBy String // userId of the creator
   createdAt DateTime @default(now())
@@ -24,21 +23,23 @@ model Family {
 }
 
 model FamilyMember {
-  userId   String
-  familyId String
-  role     String // Roles like "Owner", "Admin", "Member"
-  joinedAt DateTime @default(now())
+  familyMemberId        String   @id @default(uuid()) // Primary key
+  userId    String   // Foreign key to user
+  familyId  String   // Foreign key to family
+  role      String   // Roles like "Owner", "Admin", "Member"
+  createdAt DateTime @default(now())
 
-  family Family @relation(fields: [familyId], references: [id])
+  family Family @relation(fields: [familyId], references: [familyId])
 
-  @@id([userId, familyId]) // Composite primary key
+  @@index([userId])
+  @@index([familyId])
 }
 
 model Category {
   createdAt DateTime @default(now())
   name      String
   userId    String
-  familyId  String?
+  familyMemberId  String?
   icon      String
   type      String   @default("income")
 
@@ -53,19 +54,19 @@ model Transaction {
   description  String
   date         DateTime
   userId       String // Nullable when part of a family transaction
-  familyId     String? // Nullable when used for individual transactions
+  familyMemberId     String? // Nullable when used for individual transactions
   type         String   @default("income")
   isIndividual Boolean  @default(true) // Indicates if it is an individual transaction
 
   category     String
   categoryIcon String
 
-  @@index([userId, familyId]) // Add an index to optimize querying based on user/family context
+  @@index([userId, familyMemberId]) // Add an index to optimize querying based on user/family context
 }
 
 model MonthHistory {
   userId   String
-  familyId String?
+  familyMemberId String?
   day      Int
   month    Int
   year     Int
@@ -77,7 +78,7 @@ model MonthHistory {
 
 model YearHistory {
   userId   String
-  familyId String?
+  familyMemberId String?
   month    Int
   year     Int
   income   Float

@@ -68,7 +68,7 @@ async function getCategoriesStats(
   from: Date,
   to: Date,
   mode: string,
-  familyId: string | null
+  familyMemberId: string | null
 ) {
   const stats = await prisma.transaction.groupBy({
     by: ["type", "category", "categoryIcon"],
@@ -77,7 +77,7 @@ async function getCategoriesStats(
         { date: { gte: from } },
         { date: { lte: to } },
         { userId: userId },
-        { familyId: familyId },
+        { familyMemberId: familyMemberId },
         // temp fix because i havent set the function to delete the transaction if the category is deleted.
         {
           category: {

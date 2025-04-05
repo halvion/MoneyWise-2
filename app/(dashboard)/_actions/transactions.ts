@@ -1,7 +1,10 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { createTransactionSchema, createTransactionSchemaType } from "@/schema/transaction";
+import {
+  createTransactionSchema,
+  createTransactionSchemaType,
+} from "@/schema/transaction";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -14,21 +17,21 @@ export async function createTransaction(form: createTransactionSchemaType) {
 
   const user = await currentUser();
   if (!user) {
-    redirect('/sign-in');
+    redirect("/sign-in");
   }
   const userSettings = await prisma.userSettings.findUnique({
     where: { userId: user.id },
   });
 
   if (!userSettings) {
-    redirect('/wizard');
+    redirect("/wizard");
   }
 
-  const isIndividualMode = userSettings.mode === 'Individual';
+  const isIndividualMode = userSettings.mode === "Individual";
 
   const { amount, category, date, description, type } = parsedBody.data;
 
-  let familyId = null;
+  let familyMemberId = null;
 
   if (!isIndividualMode) {
     const familyMember = await prisma.familyMember.findFirst({
@@ -37,19 +40,17 @@ export async function createTransaction(form: createTransactionSchemaType) {
 
     if (!familyMember) {
       // TEMP FIX
-      familyId = null;
+      familyMemberId = null;
       // throw new Error("Family not found");
-    }
-
-    else familyId = familyMember.familyId;
+    } else familyMemberId = familyMember.familyId;
   }
 
   const categoryRow = await prisma.category.findFirst({
     where: {
       userId: user.id,
       name: category,
-      familyId: familyId,
-    }
+      familyMemberId: familyMemberId,
+    },
   });
 
   if (!categoryRow) {
@@ -58,13 +59,11 @@ export async function createTransaction(form: createTransactionSchemaType) {
 
   // NOTE: don't make confusion between $transaction (prisma) and prisma.transaction (table)
 
-
-
   await prisma.$transaction([
     prisma.transaction.create({
       data: {
         userId: user.id,
-        familyId: familyId,
+        familyMemberId: familyMemberId,
         amount,
         description: description || "",
         date,
@@ -84,25 +83,25 @@ export async function createTransaction(form: createTransactionSchemaType) {
           month: date.getUTCMonth(),
           year: date.getUTCFullYear(),
         },
-        familyId: familyId,
+        familyMemberId: familyMemberId,
       },
       create: {
         userId: user.id,
-        familyId: familyId,
+        familyMemberId: familyMemberId,
         day: date.getUTCDate(),
         month: date.getUTCMonth(),
         year: date.getUTCFullYear(),
-        income: type === 'income' ? amount : 0,
-        expense: type === 'expense' ? amount : 0,
+        income: type === "income" ? amount : 0,
+        expense: type === "expense" ? amount : 0,
       },
       update: {
         income: {
-          increment: type === 'income' ? amount : 0,
+          increment: type === "income" ? amount : 0,
         },
         expense: {
-          increment: type === 'expense' ? amount : 0,
+          increment: type === "expense" ? amount : 0,
         },
-      }
+      },
     }),
 
     // Update yearly aggregates table
@@ -113,25 +112,24 @@ export async function createTransaction(form: createTransactionSchemaType) {
           month: date.getUTCMonth(),
           year: date.getUTCFullYear(),
         },
-        familyId: familyId,
+        familyMemberId: familyMemberId,
       },
       create: {
         userId: user.id,
-        familyId: familyId,
+        familyMemberId: familyMemberId,
         month: date.getUTCMonth(),
         year: date.getUTCFullYear(),
-        income: type === 'income' ? amount : 0,
-        expense: type === 'expense' ? amount : 0,
+        income: type === "income" ? amount : 0,
+        expense: type === "expense" ? amount : 0,
       },
       update: {
         income: {
-          increment: type === 'income' ? amount : 0,
+          increment: type === "income" ? amount : 0,
         },
         expense: {
-          increment: type === 'expense' ? amount : 0,
+          increment: type === "expense" ? amount : 0,
         },
-      }
-    })
-  ])
-
+      },
+    }),
+  ]);
 }

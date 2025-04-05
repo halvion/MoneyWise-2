@@ -80,7 +80,7 @@ async function getTransactionsHistory(userId: string, from: Date, to: Date, isIn
       // TEMP FIX
       // isIndividual: isIndividualMode,
       AND: [
-        isIndividualMode ? { userId: userId } : { familyId: familyId }
+        isIndividualMode ? { userId: userId } : { familyMemberId: familyId }
       ]
     },
     orderBy: {

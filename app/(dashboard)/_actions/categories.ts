@@ -1,7 +1,12 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { CreateCategorySchema, CreateCategorySchemaType, DeleteCategorySchema, DeleteCategorySchemaType } from "@/schema/categories";
+import {
+  CreateCategorySchema,
+  CreateCategorySchemaType,
+  DeleteCategorySchema,
+  DeleteCategorySchemaType,
+} from "@/schema/categories";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
@@ -14,7 +19,7 @@ export async function createCategory(form: CreateCategorySchemaType) {
 
   const user = await currentUser();
   if (!user) {
-    redirect('/sign-in');
+    redirect("/sign-in");
   }
 
   const userSettings = await prisma.userSettings.findUnique({
@@ -22,12 +27,12 @@ export async function createCategory(form: CreateCategorySchemaType) {
   });
 
   if (!userSettings) {
-    redirect('/wizard');
+    redirect("/wizard");
   }
 
-  const isIndividualMode = userSettings.mode === 'Individual';
+  const isIndividualMode = userSettings.mode === "Individual";
 
-  let familyId = null;
+  let familyMemberId = null;
 
   if (!isIndividualMode) {
     const familyMember = await prisma.familyMember.findFirst({
@@ -37,26 +42,24 @@ export async function createCategory(form: CreateCategorySchemaType) {
     if (!familyMember) {
       // throw new Error("Family not found");
       // TEMP FIX
-      familyId = null;
-    }
-
-    else familyId = familyMember.familyId;
+      familyMemberId = null;
+    } else familyMemberId = familyMember.familyId;
   }
 
   const { name, icon, type } = parsedBody.data;
   const category = await prisma.category.create({
     data: {
       userId: user.id,
-      familyId: familyId,
+      familyMemberId: familyMemberId,
       name,
       icon,
       type,
-    }
+    },
   });
   return category;
 }
 
-export async function DeleteCategory(form: DeleteCategorySchemaType){
+export async function DeleteCategory(form: DeleteCategorySchemaType) {
   const parsedBody = DeleteCategorySchema.safeParse(form);
 
   if (!parsedBody.success) {
@@ -78,7 +81,7 @@ export async function DeleteCategory(form: DeleteCategorySchemaType){
 
   const isIndividualMode = userSettings.mode === "Individual";
 
-  let familyId = null;
+  let familyMemberId = null;
 
   if (!isIndividualMode) {
     const familyMember = await prisma.familyMember.findFirst({
@@ -88,8 +91,8 @@ export async function DeleteCategory(form: DeleteCategorySchemaType){
     if (!familyMember) {
       // throw new Error("Family not found");
       // TEMP FIX
-      familyId = null;
-    } else familyId = familyMember.familyId;
+      familyMemberId = null;
+    } else familyMemberId = familyMember.familyId;
   }
 
   const category = await prisma.category.findUnique({
@@ -102,7 +105,7 @@ export async function DeleteCategory(form: DeleteCategorySchemaType){
     },
   });
 
-  if (category && category.familyId === familyId) {
+  if (category && category.familyMemberId === familyMemberId) {
     return await prisma.category.delete({
       where: {
         name_userId_type: {
@@ -112,7 +115,5 @@ export async function DeleteCategory(form: DeleteCategorySchemaType){
         },
       },
     });
-  }
-  else throw new Error("Failed to delete");
+  } else throw new Error("Failed to delete");
 }
-

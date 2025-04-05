@@ -20,7 +20,7 @@ interface Props {
 function CategoriesStats({ userSettings, from, to }: Props) {
 
   const statsQuery = useQuery<GetCategoriesStatsResponseType>({
-    queryKey: ["overview", "stats", "categories", from, to, userSettings.mode],
+    queryKey: ["overview", "stats", "categories", DateToUTCDate(from), DateToUTCDate(to), userSettings.mode],
     queryFn: () => fetch(`/api/stats/categories?from=${encodeURIComponent(DateToUTCDate(from).toISOString())}&to=${encodeURIComponent(DateToUTCDate(to).toISOString())}&mode=${encodeURIComponent(userSettings.mode)}`).then(res => res.json()),
   });
 
@@ -71,7 +71,7 @@ function CategoriesCard({ data, type, formatter }: {
       {filteredData.length === 0 && (
         <div className="flex h-60 w-full flex-col items-center justify-center">
           No data for the selected period.
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-center">
             Try selecting a different period or try adding new {" "}
             {type === "income" ? "income" : "expense"} transactions.
           </p>
@@ -97,7 +97,7 @@ function CategoriesCard({ data, type, formatter }: {
                       {formatter.format(amount)}
                     </span>
                   </div>
-                  <Progress 
+                  <Progress
                     value={percentage}
                     indicator={
                       type === "income" ? "bg-emerald-500" : "bg-red-500"

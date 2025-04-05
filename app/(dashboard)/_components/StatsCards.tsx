@@ -16,12 +16,12 @@ interface Props {
   userSettings: UserSettings;
 }
 
-function StatsCards({from, to, userSettings}: Props) {
+function StatsCards({ from, to, userSettings }: Props) {
   const userMode = userSettings.mode;
   const statsQuery = useQuery<GetBalanceStatsReponseType>({
-    queryKey: ['stats', 'balance', from, to, userMode],
+    queryKey: ['stats', 'balance', DateToUTCDate(from), DateToUTCDate(to), userMode],
     queryFn: () => fetch(`/api/stats/balance?from=${DateToUTCDate(from)}&to=${DateToUTCDate(to)}&mode=${userSettings.mode}`)
-    .then((res) => res.json()),
+      .then((res) => res.json()),
   })
 
   const formatter = useMemo(() => {
@@ -69,15 +69,15 @@ function StatsCards({from, to, userSettings}: Props) {
 
 export default StatsCards
 
-function StatCard({formatter, value, title, icon} : {
+function StatCard({ formatter, value, title, icon }: {
   formatter: Intl.NumberFormat;
   value: number;
   title: string;
   icon: ReactNode;
 }) {
-  const formatFn = useCallback((value : number) => {
-      return formatter.format(value);
-    }, 
+  const formatFn = useCallback((value: number) => {
+    return formatter.format(value);
+  },
     [formatter]
   );
   return (

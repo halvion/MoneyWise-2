@@ -7,11 +7,11 @@ export async function GET(request: Request) {
   const user = await currentUser();
 
   if (!user) {
-    redirect('/sign-in');
+    redirect("/sign-in");
   }
 
   const { searchParams } = new URL(request.url);
-  const paramType = searchParams.get('type');
+  const paramType = searchParams.get("type");
 
   const validator = z.enum(["income", "expense"]).nullable();
   const queryParams = validator.safeParse(paramType);
@@ -28,12 +28,14 @@ export async function GET(request: Request) {
   });
 
   if (!userSettings) {
-    return new Response(JSON.stringify({ error: "User settings not found" }), { status: 404 });
+    return new Response(JSON.stringify({ error: "User settings not found" }), {
+      status: 404,
+    });
   }
 
-  const isIndividualMode = userSettings.mode === 'Individual';
+  const isIndividualMode = userSettings.mode === "Individual";
 
-  let familyId = null;
+  let familyMemberId = null;
 
   if (!isIndividualMode) {
     // Fetch the familyId for the user
@@ -44,22 +46,20 @@ export async function GET(request: Request) {
     if (!familyMember) {
       // TEMPORARY FIX
       // return new Response(JSON.stringify({ error: "Family not found" }), { status: 404 });
-      familyId = null;
-    }
-
-    else familyId = familyMember.familyId;
+      familyMemberId = null;
+    } else familyMemberId = familyMember.familyId;
   }
 
   const categories = await prisma.category.findMany({
     where: {
       userId: user.id,
       ...(type && { type }), // include type in the filters if it's defined
-      familyId: familyId,
+      familyMemberId: familyMemberId,
     },
     orderBy: {
-      name: 'asc',
-    }
-  })
+      name: "asc",
+    },
+  });
 
   return Response.json(categories);
 }
