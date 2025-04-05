@@ -82,13 +82,13 @@ function CreateCategoryDialog({ type, successCallback, trigger }: Props) {
 
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
-      { trigger ? (
-        trigger ) : (<Button variant={'ghost'}
-        className='flex border-separate items-center jusitfy-left rounded-none border-b px-3 py-3 text-muted-foreground'>
-        <PlusSquare className='mr-2 h-4 w-4' />
-        Create new
-      </Button>
-    )}
+      {trigger ? (
+        trigger) : (<Button variant={'ghost'}
+          className='flex border-separate items-center jusitfy-left rounded-none border-b px-3 py-3 text-muted-foreground'>
+          <PlusSquare className='mr-2 h-4 w-4' />
+          Create new category
+        </Button>
+      )}
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
@@ -150,7 +150,12 @@ function CreateCategoryDialog({ type, successCallback, trigger }: Props) {
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-full max-h-[300px] '>
+                    <PopoverContent
+                      className='w-[352px] max-h-[300px] p-0'
+                      side="bottom"
+                      align="center"
+                      sideOffset={5}
+                    >
                       <Picker data={data}
                         theme={theme.resolvedTheme}
                         onEmojiSelect={(emoji: { native: string }) => {

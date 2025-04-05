@@ -70,6 +70,10 @@ function CreateTransactionDialog({ trigger, type }: Props) {
         queryKey: ['stats', 'balance'],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ['overview', 'history'],
+      });
+
       setOpen((prev) => !prev);
     }
   })
@@ -131,12 +135,12 @@ function CreateTransactionDialog({ trigger, type }: Props) {
               )}
             />
 
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex  items-start justify-between gap-2">
               <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col flex-1">
                     <FormLabel>Category</FormLabel>
                     <FormControl>
                       <CategoryPicker type={type} onChange={handleCategoryChange} />
