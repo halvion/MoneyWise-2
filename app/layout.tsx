@@ -27,6 +27,7 @@ export default function RootLayout({
         <body>
           <Toaster richColors position="bottom-right" />
           <RootProviders>{children}</RootProviders>
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
