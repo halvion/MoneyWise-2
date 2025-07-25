@@ -110,6 +110,5 @@ To run MoneyWise locally:
    ```bash
    npm run dev
    ```
-Test commit
 
 6. Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
